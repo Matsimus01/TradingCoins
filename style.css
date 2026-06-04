@@ -1,100 +1,100 @@
-let chart;
-
-async function searchCoin() {
-  const coin = document.getElementById("coinInput").value
-    .toLowerCase()
-    .trim()
-    .replaceAll(" ", "-");
-
-  if (coin === "") {
-    alert("Please type a coin name, for example bitcoin");
-    return;
-  }
-
-  await loadMarketData(coin);
-  await loadChart(coin);
+:root {
+  color-scheme: dark;
+  --bg: #090d14;
+  --panel: #121925;
+  --panel-soft: #172233;
+  --border: #263448;
+  --text: #edf4ff;
+  --muted: #97a7bc;
+  --accent: #48d1cc;
+  --accent-dark: #0e8d91;
+  --green: #32d583;
+  --red: #fb7185;
+  --yellow: #fbbf24;
+  --shadow: rgba(0, 0, 0, 0.32);
 }
 
-async function loadMarketData(coin) {
-  const url = `https://api.coingecko.com/api/v3/coins/${coin}`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const price = data.market_data.current_price.usd;
-    const marketCap = data.market_data.market_cap.usd;
-    const volume = data.market_data.total_volume.usd;
-    const change24h = data.market_data.price_change_percentage_24h;
-    const change7d = data.market_data.price_change_percentage_7d;
-
-    let expectation = "";
-    let className = "";
-
-    if (change7d > 5) {
-      expectation = "Bullish trend: the coin has strong upward momentum.";
-      className = "good";
-    } else if (change7d < -5) {
-      expectation = "Bearish trend: the coin has been falling recently.";
-      className = "bad";
-    } else {
-      expectation = "Neutral trend: the market is moving sideways.";
-      className = "neutral";
-    }
-
-    document.getElementById("result").innerHTML = `
-      <div class="card">
-        <h2>${data.name} (${data.symbol.toUpperCase()})</h2>
-        <p><strong>Price:</strong> $${price.toLocaleString()}</p>
-        <p><strong>Market Cap:</strong> $${marketCap.toLocaleString()}</p>
-        <p><strong>24h Volume:</strong> $${volume.toLocaleString()}</p>
-        <p><strong>24h Change:</strong> ${change24h.toFixed(2)}%</p>
-        <p><strong>7d Change:</strong> ${change7d.toFixed(2)}%</p>
-        <h3 class="${className}">${expectation}</h3>
-        <p>This is not financial advice. It is only based on recent market movement.</p>
-      </div>
-    `;
-  } catch (error) {
-    document.getElementById("result").innerHTML = `
-      <div class="card">
-        <h2>Coin not found</h2>
-        <p>Try using names like bitcoin, ethereum, solana, dogecoin.</p>
-      </div>
-    `;
-  }
+* {
+  box-sizing: border-box;
 }
 
-async function loadChart(coin) {
-  const url = `https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=usd&days=7`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  const labels = data.prices.map(price => {
-    const date = new Date(price[0]);
-    return date.toLocaleDateString();
-  });
-
-  const prices = data.prices.map(price => price[1]);
-
-  const ctx = document.getElementById("priceChart");
-
-  if (chart) {
-    chart.destroy();
-  }
-
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: `${coin} price last 7 days`,
-        data: prices,
-        borderWidth: 2
-      }]
-    }
-  });
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #090d14 0%, #0e1520 48%, #12101a 100%);
+  color: var(--text);
 }
 
-document.getElementById("coinInput").value = "bitcoin";
-searchCoin();
+.app-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.eyebrow,
+.label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 14px;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 0.98;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.45rem;
+}
+
+.subtitle {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.search-panel,
+.coin-card,
+.chart-section {
+  border: 1px solid var(--border);
+  background: rgba(18, 25, 37, 0.92);
+  box-shadow: 0 24px 60px var(--shadow);
+}
+
+.search-panel {
+  padding: 18px;
+  border-radius: 8px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.search-row {
+  display: flex;
+  gap: 10px;
