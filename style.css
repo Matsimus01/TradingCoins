@@ -1,27 +1,100 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-  padding: 30px;
+let chart;
+
+async function searchCoin() {
+  const coin = document.getElementById("coinInput").value
+    .toLowerCase()
+    .trim()
+    .replaceAll(" ", "-");
+
+  if (coin === "") {
+    alert("Please type a coin name, for example bitcoin");
+    return;
+  }
+
+  await loadMarketData(coin);
+  await loadChart(coin);
 }
 
-h1 {
-  color: #38bdf8;
+async function loadMarketData(coin) {
+  const url = `https://api.coingecko.com/api/v3/coins/${coin}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const price = data.market_data.current_price.usd;
+    const marketCap = data.market_data.market_cap.usd;
+    const volume = data.market_data.total_volume.usd;
+    const change24h = data.market_data.price_change_percentage_24h;
+    const change7d = data.market_data.price_change_percentage_7d;
+
+    let expectation = "";
+    let className = "";
+
+    if (change7d > 5) {
+      expectation = "Bullish trend: the coin has strong upward momentum.";
+      className = "good";
+    } else if (change7d < -5) {
+      expectation = "Bearish trend: the coin has been falling recently.";
+      className = "bad";
+    } else {
+      expectation = "Neutral trend: the market is moving sideways.";
+      className = "neutral";
+    }
+
+    document.getElementById("result").innerHTML = `
+      <div class="card">
+        <h2>${data.name} (${data.symbol.toUpperCase()})</h2>
+        <p><strong>Price:</strong> $${price.toLocaleString()}</p>
+        <p><strong>Market Cap:</strong> $${marketCap.toLocaleString()}</p>
+        <p><strong>24h Volume:</strong> $${volume.toLocaleString()}</p>
+        <p><strong>24h Change:</strong> ${change24h.toFixed(2)}%</p>
+        <p><strong>7d Change:</strong> ${change7d.toFixed(2)}%</p>
+        <h3 class="${className}">${expectation}</h3>
+        <p>This is not financial advice. It is only based on recent market movement.</p>
+      </div>
+    `;
+  } catch (error) {
+    document.getElementById("result").innerHTML = `
+      <div class="card">
+        <h2>Coin not found</h2>
+        <p>Try using names like bitcoin, ethereum, solana, dogecoin.</p>
+      </div>
+    `;
+  }
 }
 
-input {
-  padding: 10px;
-  width: 300px;
+async function loadChart(coin) {
+  const url = `https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=usd&days=7`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  const labels = data.prices.map(price => {
+    const date = new Date(price[0]);
+    return date.toLocaleDateString();
+  });
+
+  const prices = data.prices.map(price => price[1]);
+
+  const ctx = document.getElementById("priceChart");
+
+  if (chart) {
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: `${coin} price last 7 days`,
+        data: prices,
+        borderWidth: 2
+      }]
+    }
+  });
 }
 
-button {
-  padding: 10px 15px;
-  cursor: pointer;
-}
-
-.card {
-  background: #1e293b;
-  padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
-}
+document.getElementById("coinInput").value = "bitcoin";
+searchCoin();
