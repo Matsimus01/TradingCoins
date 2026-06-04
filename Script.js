@@ -1,26 +1,57 @@
-async function loadPrices() {
-  const coins = document.getElementById("coinInput").value.toLowerCase().replaceAll(" ", "");
-
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coins}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  const market = document.getElementById("market");
-  market.innerHTML = "";
-
-  for (let coin in data) {
-    market.innerHTML += `
-      <div class="card">
-        <h2>${coin.toUpperCase()}</h2>
-        <p>Price: $${data[coin].usd}</p>
-        <p>Market Cap: $${Math.round(data[coin].usd_market_cap).toLocaleString()}</p>
-        <p>24h Volume: $${Math.round(data[coin].usd_24h_vol).toLocaleString()}</p>
-        <p>24h Change: ${data[coin].usd_24h_change.toFixed(2)}%</p>
-      </div>
-    `;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #020617;
+  color: white;
+  padding: 30px;
 }
 
-loadPrices();
-setInterval(loadPrices, 30000);
+h1 {
+  color: #38bdf8;
+  font-size: 42px;
+}
+
+.search-box {
+  margin-bottom: 25px;
+}
+
+input {
+  padding: 12px;
+  width: 320px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #38bdf8;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+}
+
+.good {
+  color: #22c55e;
+}
+
+.bad {
+  color: #ef4444;
+}
+
+.neutral {
+  color: #facc15;
+}
+
+canvas {
+  background: white;
+  border-radius: 14px;
+  padding: 15px;
+  max-width: 900px;
+}
