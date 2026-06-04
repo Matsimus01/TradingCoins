@@ -6,13 +6,18 @@
 </head>
 <body>
   <h1>TradingCoins</h1>
-  <p>Live crypto market prices</p>
+  <p>Search a coin and view live market data</p>
 
-  <input id="coinInput" value="bitcoin,ethereum,solana">
-  <button onclick="loadPrices()">Update</button>
+  <div class="search-box">
+    <input id="coinInput" placeholder="Type: bitcoin, ethereum, solana">
+    <button onclick="searchCoin()">Search</button>
+  </div>
 
-  <div id="market"></div>
+  <div id="result"></div>
 
+  <canvas id="priceChart"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
